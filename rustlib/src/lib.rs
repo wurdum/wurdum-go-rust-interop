@@ -1,9 +1,17 @@
 use std::ffi::{CStr, CString};
-use std::os::raw::c_char;
+use std::os::raw::{c_char, c_int};
+
+/// Struct that represents data with a callback function pointer
+#[repr(C)]
+pub struct DataWithCallback {
+    pub data: *const c_int,
+    pub length: c_int,  // Changed from usize to c_int to match Go's int type
+    pub callback: extern "C" fn(c_int),
+}
 
 /// Simple function that adds two numbers
 #[no_mangle]
-pub extern "C" fn add_numbers(a: i32, b: i32) -> i32 {
+pub extern "C" fn add_numbers(a: c_int, b: c_int) -> c_int {
     a + b
 }
 
@@ -51,5 +59,61 @@ pub extern "C" fn fibonacci(n: u32) -> u64 {
             }
             b
         }
+    }
+}
+
+/// Process data with callback function
+/// This function doubles each number in the array and calls the callback for each result
+#[no_mangle]
+pub extern "C" fn process_data_with_callback(data_struct: DataWithCallback) -> c_int {
+    unsafe {
+        if data_struct.data.is_null() || data_struct.length <= 0 {
+            return -1;
+        }
+
+        // Create a slice from the raw pointer
+        let data_slice = std::slice::from_raw_parts(data_struct.data, data_struct.length as usize);
+
+        let mut processed_count = 0;
+
+        // Process each element
+        for &value in data_slice {
+            // Double the value as an example of processing
+            let processed_value = value * 2;
+
+            // Call the Go callback function with the processed value
+            (data_struct.callback)(processed_value);
+
+            processed_count += 1;
+        }
+
+        processed_count
+    }
+}
+
+/// Process data with callback and return sum
+/// This function calculates sum of all elements and calls callback with running totals
+#[no_mangle]
+pub extern "C" fn sum_with_callback(data_struct: DataWithCallback) -> c_int {
+    unsafe {
+        // Validate input
+        if data_struct.data.is_null() || data_struct.length <= 0 {
+            return 0;
+        }
+
+        // Create a slice from the raw pointer
+        let data_slice = std::slice::from_raw_parts(data_struct.data, data_struct.length as usize);
+
+        let mut running_sum = 0;
+
+        // Process each element and maintain running sum
+        for &value in data_slice {
+            running_sum += value;
+
+            // Call the Go callback with current running sum
+            (data_struct.callback)(running_sum);
+        }
+
+        running_sum
     }
 }
