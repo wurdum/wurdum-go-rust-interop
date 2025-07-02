@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>WurdumRustInterop</RootNamespace>
+    <AssemblyName>wurdum-dotnet-interop</AssemblyName>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.InteropServices" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildProjectDirectory)/../dist/librustlib.*"
+          Condition="Exists('$(MSBuildProjectDirectory)/../dist/')"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="native/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Windows -->
+    <None Include="$(MSBuildProjectDirectory)/../dist/rustlib.dll"
+          Condition="Exists('$(MSBuildProjectDirectory)/../dist/rustlib.dll') AND ('$(RuntimeIdentifier)' == '' OR $(RuntimeIdentifier.StartsWith('win')))"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="rustlib.dll" />
+
+    <!-- macOS -->
+    <None Include="$(MSBuildProjectDirectory)/../dist/librustlib.dylib"
+          Condition="Exists('$(MSBuildProjectDirectory)/../dist/librustlib.dylib') AND ('$(RuntimeIdentifier)' == '' OR $(RuntimeIdentifier.StartsWith('osx')))"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="librustlib.dylib" />
+
+    <!-- Linux -->
+    <None Include="$(MSBuildProjectDirectory)/../dist/librustlib.so"
+          Condition="Exists('$(MSBuildProjectDirectory)/../dist/librustlib.so') AND ('$(RuntimeIdentifier)' == '' OR $(RuntimeIdentifier.StartsWith('linux')))"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="librustlib.so" />
+  </ItemGroup>
+
+  <!-- Development-time native library paths -->
+  <Target Name="CopyNativeLibraries" BeforeTargets="Build">
+    <ItemGroup>
+      <NativeLibraries Include="$(MSBuildProjectDirectory)/../dist/librustlib.*" />
+      <NativeLibraries Include="$(MSBuildProjectDirectory)/../dist/rustlib.dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(NativeLibraries)"
+          DestinationFolder="$(OutputPath)"
+          SkipUnchangedFiles="true"
+          Condition="Exists('%(Identity)')" />
+  </Target>
+
+</Project>

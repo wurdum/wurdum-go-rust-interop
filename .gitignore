@@ -1,6 +1,8 @@
 # Build artifacts
 dist/
 wurdum-interop
+wurdum-go-interop
+wurdum-dotnet-interop
 
 # Rust
 rustlib/target/
@@ -10,11 +12,24 @@ rustlib/Cargo.lock
 *.test
 *.out
 
+# .NET
+dotnet/bin/
+dotnet/obj/
+*.dll
+*.pdb
+*.cache
+*.rsp
+*.props
+*.targets
+.dotnet/
+*.user
+
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+.vs/
 
 # OS
 .DS_Store
