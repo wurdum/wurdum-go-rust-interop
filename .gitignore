@@ -1,0 +1,20 @@
+# Build artifacts
+dist/
+wurdum-interop
+
+# Rust
+rustlib/target/
+rustlib/Cargo.lock
+
+# Go
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
