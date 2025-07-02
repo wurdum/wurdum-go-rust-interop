@@ -1,0 +1,11 @@
+[package]
+name = "rustlib"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rustlib"
+crate-type = ["cdylib", "staticlib"] # Creates both dynamic and static libraries
+
+[dependencies]
+libc = "0.2" # For C interop types
