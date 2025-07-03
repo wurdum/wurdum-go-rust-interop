@@ -1,146 +1,178 @@
-using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace WurdumRustInterop
+namespace WurdumRustInterop;
+
+// Struct to match Rust's DataWithCallback
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe struct DataWithCallback
 {
-    class Program
+    public int* data;
+    public int length;
+    public delegate* unmanaged[Cdecl]<int, void> callback;
+}
+
+// Modern interop with LibraryImport (source generators)
+internal static partial class RustInterop
+{
+    private const string LibraryName = "librustlib";
+
+    // Simple functions using LibraryImport
+    [LibraryImport(LibraryName)]
+    public static partial int add_numbers(int a, int b);
+
+    [LibraryImport(LibraryName)]
+    public static partial ulong fibonacci(uint n);
+
+    // String handling with UTF-8 marshalling
+    [LibraryImport(LibraryName)]
+    private static partial IntPtr process_string([MarshalAs(UnmanagedType.LPUTF8Str)] string input);
+
+    [LibraryImport(LibraryName)]
+    internal static partial void free_rust_string(IntPtr s);
+
+    // Modern callback approach using function pointers
+    [LibraryImport(LibraryName)]
+    public static unsafe partial int process_data_with_callback(DataWithCallback dataStruct);
+
+    [LibraryImport(LibraryName)]
+    public static unsafe partial int sum_with_callback(DataWithCallback dataStruct);
+
+    // Wrapper for safe string handling
+    public static string ProcessString(string input)
     {
-        static Program()
+        var resultPtr = process_string(input);
+        if (resultPtr == IntPtr.Zero) return string.Empty;
+
+        try
         {
-            // Initialize native library loader
-            NativeLibraryLoader.Initialize();
-        }
-        // Platform-specific library loading
-        private const string LibraryName = "rustlib";
-
-        // Simple functions
-        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int add_numbers(int a, int b);
-
-        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr process_string(IntPtr input);
-
-        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void free_rust_string(IntPtr s);
-
-        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern ulong fibonacci(uint n);
-
-        // Callback delegate types
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void CallbackDelegate(int value);
-
-        // Struct for data with callback
-        [StructLayout(LayoutKind.Sequential)]
-        private struct DataWithCallback
-        {
-            public IntPtr data;
-            public int length;
-            public IntPtr callback; // Function pointer
-        }
-
-        // Functions that use callbacks
-        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int process_data_with_callback(DataWithCallback dataStruct);
-
-        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int sum_with_callback(DataWithCallback dataStruct);
-
-        // Callback implementations
-        private static void ProcessCallback(int value)
-        {
-            Console.WriteLine($"  → Rust processed value: {value}");
-        }
-
-        private static void SumCallback(int value)
-        {
-            Console.WriteLine($"  → Running sum: {value}");
-        }
-
-        static void Main(string[] args)
-        {
-            Console.WriteLine("=== Wurdum .NET-Rust Interop Demo ===");
-
-            // Example 1: Call simple addition function
-            int result = add_numbers(5, 7);
-            Console.WriteLine($"5 + 7 = {result}");
-
-            // Example 2: Process a string
-            IntPtr inputPtr = Marshal.StringToHGlobalAnsi("hello from dotnet");
-            try
+            unsafe
             {
-                IntPtr processedPtr = process_string(inputPtr);
-                string processedStr = Marshal.PtrToStringAnsi(processedPtr);
-                Console.WriteLine($"Processed string: {processedStr}");
-                free_rust_string(processedPtr);
+                var resultUtf8Ptr = (byte*)resultPtr;
+                var length = GetUtf8StringLength(resultUtf8Ptr);
+                return Encoding.UTF8.GetString(resultUtf8Ptr, length);
             }
-            finally
-            {
-                Marshal.FreeHGlobal(inputPtr);
-            }
+        }
+        finally
+        {
+            free_rust_string(resultPtr);
+        }
 
-            // Example 3: Calculate Fibonacci
-            ulong fib = fibonacci(10);
-            Console.WriteLine($"Fibonacci(10) = {fib}");
+        static unsafe int GetUtf8StringLength(byte* ptr)
+        {
+            if (ptr == null) return 0;
+            var length = 0;
+            while (ptr[length] != 0) length++;
+            return length;
+        }
+    }
+}
 
-            Console.WriteLine("\n=== NEW: Callback Examples ===");
+public class Program
+{
+    static Program()
+    {
+        // Initialize native library loader
+        NativeLibraryLoader.Initialize();
+    }
 
-            // Example 4: Data processing with callback
+    // Callback implementations with UnmanagedCallersOnly for better performance
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void ProcessCallbackNative(int value)
+    {
+        Console.WriteLine($"  → Rust processed value: {value}");
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void SumCallbackNative(int value)
+    {
+        Console.WriteLine($"  → Running sum: {value}");
+    }
+
+    public static void Main(string[] args)
+    {
+        Console.WriteLine("=== Wurdum .NET-Rust Interop Demo (Modernized) ===\n");
+
+        // Example 1: Call simple addition function
+        int result = RustInterop.add_numbers(5, 7);
+        Console.WriteLine($"5 + 7 = {result}");
+
+        // Example 2: Process a string (now with automatic memory management)
+        string processedStr = RustInterop.ProcessString("hello from modern dotnet");
+        Console.WriteLine($"Processed string: {processedStr}");
+
+        // Example 3: Calculate Fibonacci
+        ulong fib = RustInterop.fibonacci(10);
+        Console.WriteLine($"Fibonacci(10) = {fib}");
+
+        Console.WriteLine("\n=== Modernized Callback Examples ===");
+
+        // Example 4: Data processing with callback using Span and function pointers
+        unsafe
+        {
             Console.WriteLine("\nExample 4: Processing data with callback");
-            int[] data = { 1, 2, 3, 4, 5 };
-            Console.WriteLine($"Original data: [{string.Join(", ", data)}]");
+            Span<int> data = [1, 2, 3, 4, 5];
+            Console.WriteLine($"Original data: [{string.Join(", ", data.ToArray())}]");
             Console.WriteLine("Rust will double each value and call back:");
 
-            // Pin the array and delegate
-            GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            CallbackDelegate processDelegate = ProcessCallback;
-            GCHandle processDelegateHandle = GCHandle.Alloc(processDelegate);
-
-            try
+            fixed (int* dataPtr = data)
             {
-                DataWithCallback dataStruct = new DataWithCallback
+                var dataStruct = new DataWithCallback
                 {
-                    data = dataHandle.AddrOfPinnedObject(),
+                    data = dataPtr,
                     length = data.Length,
-                    callback = Marshal.GetFunctionPointerForDelegate(processDelegate)
+                    callback = &ProcessCallbackNative
                 };
 
-                int processedCount = process_data_with_callback(dataStruct);
+                int processedCount = RustInterop.process_data_with_callback(dataStruct);
                 Console.WriteLine($"Processed {processedCount} elements");
             }
-            finally
-            {
-                dataHandle.Free();
-                processDelegateHandle.Free();
-            }
+        }
 
-            // Example 5: Sum calculation with callback
+        // Example 5: Sum calculation with callback
+        unsafe
+        {
             Console.WriteLine("\nExample 5: Sum calculation with running totals callback");
-            int[] data2 = { 10, 20, 30, 40 };
+
+            // Using array for larger data that might not fit on stack
+            int[] data2 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             Console.WriteLine($"Data: [{string.Join(", ", data2)}]");
             Console.WriteLine("Rust will calculate running sums and call back:");
 
-            GCHandle data2Handle = GCHandle.Alloc(data2, GCHandleType.Pinned);
-            CallbackDelegate sumDelegate = SumCallback;
-            GCHandle sumDelegateHandle = GCHandle.Alloc(sumDelegate);
-
-            try
+            // Using fixed statement for heap-allocated array
+            fixed (int* dataPtr = data2)
             {
-                DataWithCallback dataStruct2 = new DataWithCallback
+                var dataStruct = new DataWithCallback
                 {
-                    data = data2Handle.AddrOfPinnedObject(),
+                    data = dataPtr,
                     length = data2.Length,
-                    callback = Marshal.GetFunctionPointerForDelegate(sumDelegate)
+                    callback = &SumCallbackNative
                 };
 
-                int totalSum = sum_with_callback(dataStruct2);
+                int totalSum = RustInterop.sum_with_callback(dataStruct);
                 Console.WriteLine($"Final sum: {totalSum}");
             }
-            finally
+        }
+
+        // Example 6: Advanced - Using CollectionsMarshal for List<T>
+        Console.WriteLine("\nExample 6: Using CollectionsMarshal with List<T>");
+        unsafe
+        {
+            var list = new List<int> { 2, 4, 6, 8, 10 };
+            var span = CollectionsMarshal.AsSpan(list);
+
+            fixed (int* dataPtr = span)
             {
-                data2Handle.Free();
-                sumDelegateHandle.Free();
+                var dataStruct = new DataWithCallback
+                {
+                    data = dataPtr,
+                    length = span.Length,
+                    callback = &SumCallbackNative
+                };
+
+                int sum = RustInterop.sum_with_callback(dataStruct);
+                Console.WriteLine($"Sum of list: {sum}");
             }
         }
     }

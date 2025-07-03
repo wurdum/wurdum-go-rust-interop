@@ -25,27 +25,15 @@ All functions are called from Go code.
 make all
 
 # Run the demo
-make run
+make run-all
 ```
 
 ## Available Commands
 
 - `make all` - Build Rust library and Go binary
-- `make run` - Build and run the complete application
+- `make run-all` - Build and run the complete application
 - `make clean` - Clean all build artifacts
 - `make dev` - Build in debug mode for development
-
-## Project Structure
-
-```
-wurdum-go-rust-interop/
-├── main.go              # Go application with CGO bindings
-├── rustlib/             # Rust library
-│   ├── Cargo.toml
-│   └── src/lib.rs       # Rust functions
-├── Makefile             # Build automation
-└── dist/                # Build output
-```
 
 ## How it works
 
