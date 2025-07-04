@@ -39,7 +39,7 @@ pub extern "C" fn free_rust_string(s: *mut c_char) {
         if s.is_null() {
             return;
         }
-        CString::from_raw(s);
+        _ = CString::from_raw(s);
     }
 }
 
@@ -66,6 +66,8 @@ pub extern "C" fn fibonacci(n: u32) -> u64 {
 /// This function doubles each number in the array and calls the callback for each result
 #[no_mangle]
 pub extern "C" fn process_data_with_callback(data_struct: DataWithCallback) -> c_int {
+    println!("process_data_with_callback called");
+
     unsafe {
         if data_struct.data.is_null() || data_struct.length <= 0 {
             return -1;
