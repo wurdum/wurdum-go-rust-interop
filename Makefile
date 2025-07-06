@@ -6,6 +6,7 @@ DOTNET_BINARY_NAME=wurdum-dotnet-interop
 DIST_DIR=dist
 RUST_LIB_DIR=rustlib/target/release
 DOTNET_DIR=dotnet
+GO_DIR=go
 
 # Detect OS for Linux/macOS support
 UNAME_S := $(shell uname -s)
@@ -38,7 +39,7 @@ build-rust: prepare
 	cp $(RUST_LIB_DIR)/$(LIB_PREFIX)rustlib.a $(DIST_DIR)/
 
 build-go: prepare build-rust
-	go build -o $(DIST_DIR)/$(GO_BINARY_NAME) main.go
+	cd $(GO_DIR) && go build -o ../$(DIST_DIR)/$(GO_BINARY_NAME) main.go
 
 build-dotnet: prepare build-rust
 	cd $(DOTNET_DIR) && dotnet build -c Release -o ../$(DIST_DIR)
@@ -63,7 +64,7 @@ dev-go: prepare
 	cd rustlib && cargo build
 	cp rustlib/target/debug/$(LIB_PREFIX)rustlib.$(LIB_EXT) $(DIST_DIR)/
 	cp rustlib/target/debug/$(LIB_PREFIX)rustlib.a $(DIST_DIR)/
-	go run main.go
+	cd $(GO_DIR) && go run main.go
 
 dev-dotnet: prepare
 	cd rustlib && cargo build

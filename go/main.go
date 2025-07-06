@@ -1,8 +1,8 @@
 package main
 
 /*
-#cgo linux LDFLAGS: -L./rustlib/target/release -lrustlib
-#cgo darwin LDFLAGS: -L./rustlib/target/release -lrustlib
+#cgo linux LDFLAGS: -L../rustlib/target/release -lrustlib
+#cgo darwin LDFLAGS: -L../rustlib/target/release -lrustlib
 #include <stdlib.h>
 
 // Declare the Rust functions

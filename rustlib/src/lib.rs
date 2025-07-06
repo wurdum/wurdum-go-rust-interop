@@ -97,6 +97,8 @@ pub extern "C" fn process_data_with_callback(data_struct: DataWithCallback) -> c
 /// This function calculates sum of all elements and calls callback with running totals
 #[no_mangle]
 pub extern "C" fn sum_with_callback(data_struct: DataWithCallback) -> c_int {
+    println!("sum_with_callback called");
+
     unsafe {
         // Validate input
         if data_struct.data.is_null() || data_struct.length <= 0 {
