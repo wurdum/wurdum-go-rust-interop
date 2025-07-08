@@ -201,45 +201,47 @@ build-dotnet-target:
 # =============================================================================
 
 # Test current platform
-test:
-	@echo "Content of DIST_DIR: $(DIST_DIR)"
-	ls -l $(DIST_DIR)
-
-	@$(MAKE) test-$(HOST_OS)-$(HOST_ARCH)
+test: test-$(HOST_OS)-$(HOST_ARCH)
 
 # Test Windows AMD64
 test-windows-amd64:
 	@echo "Testing Windows AMD64 build..."
+	@ls -l $(DIST_DIR)/windows-amd64
 	cd $(DIST_DIR)/windows-amd64 && ./$(GO_BINARY_NAME).exe
 	cd $(DIST_DIR)/windows-amd64 && dotnet ./wurdum-dotnet-interop.dll
 
 # Test Windows ARM64
 test-windows-arm64:
 	@echo "Testing Windows ARM64 build..."
+	@ls -l $(DIST_DIR)/windows-arm64
 	cd $(DIST_DIR)/windows-arm64 && ./$(GO_BINARY_NAME).exe
 	cd $(DIST_DIR)/windows-arm64 && dotnet ./wurdum-dotnet-interop.dll
 
 # Test Darwin AMD64
 test-darwin-amd64:
 	@echo "Testing macOS AMD64 build..."
+	@ls -l $(DIST_DIR)/darwin-amd64
 	cd $(DIST_DIR)/darwin-amd64 && ./$(GO_BINARY_NAME)
 	cd $(DIST_DIR)/darwin-amd64 && dotnet ./wurdum-dotnet-interop.dll
 
 # Test Darwin ARM64
 test-darwin-arm64:
 	@echo "Testing macOS ARM64 build..."
+	@ls -l $(DIST_DIR)/darwin-arm64
 	cd $(DIST_DIR)/darwin-arm64 && ./$(GO_BINARY_NAME)
 	cd $(DIST_DIR)/darwin-arm64 && dotnet ./wurdum-dotnet-interop.dll
 
 # Test Linux AMD64
 test-linux-amd64:
 	@echo "Testing Linux AMD64 build..."
+	@ls -l $(DIST_DIR)/linux-amd64
 	cd $(DIST_DIR)/linux-amd64 && ./$(GO_BINARY_NAME)
 	cd $(DIST_DIR)/linux-amd64 && dotnet ./wurdum-dotnet-interop.dll
 
 # Test Linux ARM64
 test-linux-arm64:
 	@echo "Testing Linux ARM64 build..."
+	@ls -l $(DIST_DIR)/linux-arm64
 	cd $(DIST_DIR)/linux-arm64 && ./$(GO_BINARY_NAME)
 	cd $(DIST_DIR)/linux-arm64 && dotnet ./wurdum-dotnet-interop.dll
 
