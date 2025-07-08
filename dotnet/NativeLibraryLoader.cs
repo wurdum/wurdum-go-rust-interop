@@ -58,6 +58,7 @@ public static class NativeLibraryLoader
         {
             if (File.Exists(path))
             {
+                Console.WriteLine($"Found {platformLibraryName} at: {Path.GetFullPath(path)}");
                 libraryPath = path;
                 return true;
             }
