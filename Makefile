@@ -201,7 +201,11 @@ build-dotnet-target:
 # =============================================================================
 
 # Test current platform
-test: test-$(HOST_OS)-$(HOST_ARCH)
+test:
+	@echo "Content of DIST_DIR: $(DIST_DIR)"
+	ls -l $(DIST_DIR)
+
+	@$(MAKE) test-$(HOST_OS)-$(HOST_ARCH)
 
 # Test Windows AMD64
 test-windows-amd64:
