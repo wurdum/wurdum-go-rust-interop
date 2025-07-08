@@ -1,8 +1,12 @@
 package main
 
 /*
-#cgo linux LDFLAGS: -L../rustlib/target/release -lrustlib
-#cgo darwin LDFLAGS: -L../rustlib/target/release -lrustlib
+#cgo windows,amd64 LDFLAGS: -L../dist/windows-amd64 -lrustlib -lws2_32 -luserenv -lntdll -static
+#cgo windows,arm64 LDFLAGS: -L../dist/windows-arm64 -lrustlib -lws2_32 -luserenv -lntdll -static
+#cgo darwin,amd64 LDFLAGS: -L../dist/darwin-amd64 -lrustlib
+#cgo darwin,arm64 LDFLAGS: -L../dist/darwin-arm64 -lrustlib
+#cgo linux,amd64 LDFLAGS: -L../dist/linux-amd64 -lrustlib -static
+#cgo linux,arm64 LDFLAGS: -L../dist/linux-arm64 -lrustlib -static
 #include <stdlib.h>
 
 // Declare the Rust functions
