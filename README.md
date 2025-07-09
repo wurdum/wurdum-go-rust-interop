@@ -42,6 +42,9 @@ IMPORTANT: The Windows ARM is not supported yet due to limitations with the MinG
    ```bash
    # For AMD64
    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-toolchain base-devel
+
+   # If you also need cmake and other tools
+   pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-make mingw-w64-x86_64-ninja
    ```
 6. **Add Rust targets**:
    ```bash
