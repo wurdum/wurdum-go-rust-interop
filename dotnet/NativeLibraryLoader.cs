@@ -168,7 +168,7 @@ public static class NativeLibraryLoader
 
             // Optionally pre-load the library to fail fast
             string libraryFile = GetPlatformLibraryName();
-            if (!TryGetLibraryPath(out string? libraryPath) || !NativeLibrary.TryLoad(libraryFile, out _))
+            if (!TryGetLibraryPath(out string? libraryPath) || !NativeLibrary.TryLoad(libraryPath, out _))
             {
                 // Try to provide more helpful error message
                 string currentDir = Environment.CurrentDirectory;
