@@ -89,11 +89,6 @@ jobs:
 
       # Test on native architecture only
       - name: Test ${{ matrix.target-os }}-${{ matrix.target-arch }}
-        # if: |
-        #   (matrix.os == 'windows' && matrix.target-arch == 'amd64') ||
-        #   (matrix.os == 'ubuntu' && matrix.target-arch == 'amd64') ||
-        #   (matrix.os == 'macos' && matrix.target-arch == 'arm64' && runner.arch == 'ARM64') ||
-        #   (matrix.os == 'macos' && matrix.target-arch == 'amd64' && runner.arch == 'X64')
         run: make test-${{ matrix.target-os }}-${{ matrix.target-arch }}
 
       # For cross-compiled binaries, just verify they were built
