@@ -66,7 +66,7 @@ EXE_EXT_darwin =
 
 # Rust target triples
 RUST_TARGET_windows_amd64 = x86_64-pc-windows-gnu
-RUST_TARGET_windows_arm64 = aarch64-pc-windows-gnu
+RUST_TARGET_windows_arm64 = aarch64-pc-windows-gnullvm
 RUST_TARGET_darwin_amd64 = x86_64-apple-darwin
 RUST_TARGET_darwin_arm64 = aarch64-apple-darwin
 RUST_TARGET_linux_amd64 = x86_64-unknown-linux-gnu
