@@ -16,7 +16,7 @@ internal unsafe struct DataWithCallback
 // Modern interop with LibraryImport (source generators)
 internal static partial class RustInterop
 {
-    private const string LibraryName = "librustlib";
+    public const string LibraryName = "rustlib";
 
     // Simple functions using LibraryImport
     [LibraryImport(LibraryName)]

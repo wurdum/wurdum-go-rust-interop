@@ -45,13 +45,18 @@ TARGET_OS ?= $(HOST_OS)
 TARGET_ARCH ?= $(HOST_ARCH)
 
 # Platform-specific configurations
-# Library naming conventions
-LIB_PREFIX_windows =
+# Static library naming conventions
+LIB_PREFIX_windows = lib
 LIB_PREFIX_linux = lib
 LIB_PREFIX_darwin = lib
 
+# Dynamic library naming conventions
+DLL_PREFIX_windows =
+DLL_PREFIX_linux = lib
+DLL_PREFIX_darwin = lib
+
 # Static library extensions
-LIB_EXT_windows = lib
+LIB_EXT_windows = a
 LIB_EXT_linux = a
 LIB_EXT_darwin = a
 
@@ -179,7 +184,7 @@ build-rust-target:
 	@cp $(RUST_DIR)/target/$(RUST_TARGET_$(TARGET_OS)_$(TARGET_ARCH))/release/$(LIB_PREFIX_$(TARGET_OS))rustlib.$(LIB_EXT_$(TARGET_OS)) \
 		$(DIST_DIR)/$(TARGET_OS)-$(TARGET_ARCH)/
 	@echo "  Copying dynamic library for .NET..."
-	@cp $(RUST_DIR)/target/$(RUST_TARGET_$(TARGET_OS)_$(TARGET_ARCH))/release/$(LIB_PREFIX_$(TARGET_OS))rustlib.$(DLL_EXT_$(TARGET_OS)) \
+	@cp $(RUST_DIR)/target/$(RUST_TARGET_$(TARGET_OS)_$(TARGET_ARCH))/release/$(DLL_PREFIX_$(TARGET_OS))rustlib.$(DLL_EXT_$(TARGET_OS)) \
 		$(DIST_DIR)/$(TARGET_OS)-$(TARGET_ARCH)/ 2>/dev/null || true
 
 # Build Go binary for target platform
@@ -287,7 +292,7 @@ dev-dotnet: prepare-platform
 	cd $(RUST_DIR) && cargo build
 	@cp $(RUST_DIR)/target/debug/$(LIB_PREFIX_$(HOST_OS))rustlib.$(LIB_EXT_$(HOST_OS)) \
 		$(DIST_DIR)/$(HOST_OS)-$(HOST_ARCH)/
-	@cp $(RUST_DIR)/target/debug/$(LIB_PREFIX_$(HOST_OS))rustlib.$(DLL_EXT_$(HOST_OS)) \
+	@cp $(RUST_DIR)/target/debug/$(DLL_PREFIX_$(HOST_OS))rustlib.$(DLL_EXT_$(HOST_OS)) \
 		$(DIST_DIR)/$(HOST_OS)-$(HOST_ARCH)/ 2>/dev/null || true
 	cd $(DOTNET_DIR) && dotnet run
 

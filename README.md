@@ -21,15 +21,46 @@ All functions are called from both Go and C# code.
 
 ## Prerequisites
 
+### All Platforms
 - Go 1.21+
-- .NET 9.0+
+- .NET 9.0+ SDK
 - Rust (latest stable)
-- C compiler (for CGO)
 - Make
 
-For cross-compilation:
-- Rust targets installed via `rustup target add <target>`
-- Cross-compilation toolchains for Linux ARM64 (if building on Linux)
+### Platform-Specific Requirements
+
+#### On Windows
+1. **Install Rust** from https://rustup.rs/
+2. **Install Go** from https://go.dev/dl/
+3. **Install .NET 9.0 SDK** from https://dotnet.microsoft.com/download
+4. **Install MSYS2** from https://www.msys2.org/
+   - This provides the MinGW-w64 toolchain needed for CGO
+5. **Configure MinGW-w64 toolchain**:
+   ```bash
+   # In MSYS2 terminal
+   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-toolchain base-devel
+   ```
+6. **Add Rust target**:
+   ```bash
+   rustup target add x86_64-pc-windows-gnu
+   ```
+7. **Update PATH**: Ensure the MSYS2 MinGW64 bin directory (typically `C:\msys64\mingw64\bin`) is in your PATH
+
+**Note**: The project uses MinGW-w64 toolchain on Windows for compatibility with CGO. The Rust library builds both static (`.a`) and dynamic (`.dll`) libraries.
+
+#### On macOS
+- Xcode Command Line Tools: `xcode-select --install`
+
+#### On Linux
+For cross-compilation to ARM64:
+- Cross-compilation toolchains: `gcc-aarch64-linux-gnu`
+
+### For Cross-Compilation
+Install Rust targets as needed:
+```bash
+rustup target add <target>
+# Example: rustup target add aarch64-unknown-linux-gnu
+```
 
 ## Build Commands
 
@@ -91,7 +122,7 @@ All build artifacts are placed in platform-specific directories:
 ```
 dist/
 ├── windows-amd64/
-│   ├── rustlib.lib              # Rust static library (for Go)
+│   ├── librustlib.a             # Rust static library (for Go)
 │   ├── rustlib.dll              # Rust dynamic library (for .NET)
 │   ├── wurdum-go-interop.exe    # Go executable
 │   ├── wurdum-dotnet-interop.exe    # .NET executable
@@ -138,9 +169,17 @@ make clean  # Remove all build artifacts
 4. **Makefile**: Handles cross-platform building with proper target mappings and library type selection
 5. **Library Linking**: Go uses static linking for single-file distribution, while .NET uses dynamic linking as required by P/Invoke
 
-## Notes
+## Platform-Specific Notes
 
-- The .NET build is framework-dependent and requires .NET 9.0 runtime on the target system
-- Go binaries are statically linked with the Rust library (except on macOS where full static linking isn't supported)
-- Windows builds use MSVC toolchain
-- Cross-compilation from one OS to another requires appropriate toolchains
+### Windows
+- Uses MinGW-w64 toolchain (not MSVC) for CGO compatibility
+- Rust library names: `librustlib.a` (static) and `rustlib.dll` (dynamic)
+- Both Go and .NET executables are built as `.exe` files
+
+### macOS
+- Full static linking is not supported due to macOS restrictions
+- Dynamic libraries use `.dylib` extension
+
+### Linux
+- Supports full static linking for Go binaries
+- Dynamic libraries use `.so` extension

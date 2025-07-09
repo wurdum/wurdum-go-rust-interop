@@ -77,13 +77,13 @@ public static class NativeLibraryLoader
     private static string GetPlatformLibraryName()
     {
         if (OperatingSystem.IsWindows())
-            return "rustlib.dll";
+            return $"{RustInterop.LibraryName}.dll";
 
         if (OperatingSystem.IsLinux())
-            return "librustlib.so";
+            return $"lib{RustInterop.LibraryName}.so";
 
         if (OperatingSystem.IsMacOS())
-            return "librustlib.dylib";
+            return $"lib{RustInterop.LibraryName}.dylib";
 
         throw new PlatformNotSupportedException($"Platform {RuntimeInformation.OSDescription} is not supported");
     }
