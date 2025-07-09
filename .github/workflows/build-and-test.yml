@@ -18,13 +18,13 @@ jobs:
             runs-on: windows-latest
             target-os: windows
             target-arch: amd64
-            rust-target: x86_64-pc-windows-msvc
+            rust-target: x86_64-pc-windows-gnu
 
           - os: windows
             runs-on: windows-11-arm
             target-os: windows
             target-arch: arm64
-            rust-target: aarch64-pc-windows-msvc
+            rust-target: aarch64-pc-windows-gnu
 
           # macOS builds
           - os: macos
