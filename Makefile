@@ -71,7 +71,6 @@ EXE_EXT_darwin =
 
 # Rust target triples
 RUST_TARGET_windows_amd64 = x86_64-pc-windows-gnu
-RUST_TARGET_windows_arm64 = aarch64-pc-windows-gnullvm
 RUST_TARGET_darwin_amd64 = x86_64-apple-darwin
 RUST_TARGET_darwin_arm64 = aarch64-apple-darwin
 RUST_TARGET_linux_amd64 = x86_64-unknown-linux-gnu
@@ -79,7 +78,6 @@ RUST_TARGET_linux_arm64 = aarch64-unknown-linux-gnu
 
 # Go environment variables
 GO_ENV_windows_amd64 = GOOS=windows GOARCH=amd64 CGO_ENABLED=1
-GO_ENV_windows_arm64 = GOOS=windows GOARCH=arm64 CGO_ENABLED=1
 GO_ENV_darwin_amd64 = GOOS=darwin GOARCH=amd64 CGO_ENABLED=1
 GO_ENV_darwin_arm64 = GOOS=darwin GOARCH=arm64 CGO_ENABLED=1
 GO_ENV_linux_amd64 = GOOS=linux GOARCH=amd64 CGO_ENABLED=1
@@ -87,7 +85,6 @@ GO_ENV_linux_arm64 = GOOS=linux GOARCH=arm64 CGO_ENABLED=1
 
 # .NET Runtime Identifiers
 DOTNET_RID_windows_amd64 = win-x64
-DOTNET_RID_windows_arm64 = win-arm64
 DOTNET_RID_darwin_amd64 = osx-x64
 DOTNET_RID_darwin_arm64 = osx-arm64
 DOTNET_RID_linux_amd64 = linux-x64
@@ -128,7 +125,6 @@ endef
 
 # Now generate all platform-specific targets
 $(eval $(call BUILD_PLATFORM,windows,amd64))
-$(eval $(call BUILD_PLATFORM,windows,arm64))
 $(eval $(call BUILD_PLATFORM,darwin,amd64))
 $(eval $(call BUILD_PLATFORM,darwin,arm64))
 $(eval $(call BUILD_PLATFORM,linux,amd64))
@@ -179,13 +175,6 @@ test-windows-amd64:
 	cd $(DIST_DIR)/windows-amd64 && ./$(GO_BINARY_NAME).exe
 	cd $(DIST_DIR)/windows-amd64 && dotnet ./wurdum-dotnet-interop.dll
 
-# Test Windows ARM64
-test-windows-arm64:
-	@echo "Testing Windows ARM64 build..."
-	@ls -l $(DIST_DIR)/windows-arm64
-	cd $(DIST_DIR)/windows-arm64 && ./$(GO_BINARY_NAME).exe
-	cd $(DIST_DIR)/windows-arm64 && dotnet ./wurdum-dotnet-interop.dll
-
 # Test Darwin AMD64
 test-darwin-amd64:
 	@echo "Testing macOS AMD64 build..."
@@ -219,7 +208,7 @@ test-linux-arm64:
 # =============================================================================
 
 # Build all Windows targets
-build-all-windows: build-windows-amd64 build-windows-arm64
+build-all-windows: build-windows-amd64
 
 # Build all macOS targets
 build-all-darwin: build-darwin-amd64 build-darwin-arm64
@@ -266,7 +255,6 @@ help:
 	@echo ""
 	@echo "Build targets:"
 	@echo "  make build-windows-amd64  - Build for Windows x64"
-	@echo "  make build-windows-arm64  - Build for Windows ARM64"
 	@echo "  make build-darwin-amd64   - Build for macOS x64"
 	@echo "  make build-darwin-arm64   - Build for macOS ARM64"
 	@echo "  make build-linux-amd64    - Build for Linux x64"

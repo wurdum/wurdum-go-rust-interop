@@ -5,7 +5,7 @@ A cross-platform example demonstrating how to call Rust functions from Go and C#
 ## Supported Platforms
 
 This project supports building for the following platforms:
-- **Windows**: AMD64, ARM64
+- **Windows**: AMD64
 - **macOS**: AMD64 (Intel), ARM64 (Apple Silicon)
 - **Linux**: AMD64, ARM64
 
@@ -30,18 +30,22 @@ All functions are called from both Go and C# code.
 ### Platform-Specific Requirements
 
 #### On Windows
+
+IMPORTANT: The Windows ARM is not supported yet due to limitations with the MinGW-w64 toolchain and CGO. The project currently supports only AMD64 builds on Windows.
+
 1. **Install Rust** from https://rustup.rs/
 2. **Install Go** from https://go.dev/dl/
 3. **Install .NET 9.0 SDK** from https://dotnet.microsoft.com/download
 4. **Install MSYS2** from https://www.msys2.org/
    - This provides the MinGW-w64 toolchain needed for CGO
-5. **Configure MinGW-w64 toolchain**:
+5. **Configure MinGW-w64 toolchain in MSYS2 MINGW64 terminal**:
    ```bash
-   # In MSYS2 terminal
+   # For AMD64
    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-toolchain base-devel
    ```
-6. **Add Rust target**:
+6. **Add Rust targets**:
    ```bash
+   # For AMD64
    rustup target add x86_64-pc-windows-gnu
    ```
 7. **Update PATH**: Ensure the MSYS2 MinGW64 bin directory (typically `C:\msys64\mingw64\bin`) is in your PATH
@@ -79,7 +83,6 @@ make build-windows-amd64 # Windows x64
 ```bash
 # Windows
 make build-windows-amd64  # Windows x64
-make build-windows-arm64  # Windows ARM64
 
 # macOS
 make build-darwin-amd64   # macOS Intel
@@ -92,7 +95,7 @@ make build-linux-arm64    # Linux ARM64
 
 ### Build All Platforms for an OS
 ```bash
-make build-all-windows    # Both AMD64 and ARM64
+make build-all-windows    # Only AMD64
 make build-all-darwin     # Both AMD64 and ARM64
 make build-all-linux      # Both AMD64 and ARM64
 ```
