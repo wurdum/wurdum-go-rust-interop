@@ -116,59 +116,23 @@ prepare-platform:
 # Platform-specific build targets
 # =============================================================================
 
-# Windows AMD64
-build-windows-amd64: TARGET_OS=windows
-build-windows-amd64: TARGET_ARCH=amd64
-build-windows-amd64: prepare-platform
-	@echo "Building for Windows AMD64..."
-	@$(MAKE) build-rust-target
-	@$(MAKE) build-go-target
-	@$(MAKE) build-dotnet-target
+define BUILD_PLATFORM
+build-$(1)-$(2): TARGET_OS=$(1)
+build-$(1)-$(2): TARGET_ARCH=$(2)
+build-$(1)-$(2): prepare-platform
+	@echo "Building for $(1) $(2)..."
+	@$$(MAKE) build-rust-target TARGET_OS=$(1) TARGET_ARCH=$(2)
+	@$$(MAKE) build-go-target TARGET_OS=$(1) TARGET_ARCH=$(2)
+	@$$(MAKE) build-dotnet-target TARGET_OS=$(1) TARGET_ARCH=$(2)
+endef
 
-# Windows ARM64
-build-windows-arm64: TARGET_OS=windows
-build-windows-arm64: TARGET_ARCH=arm64
-build-windows-arm64: prepare-platform
-	@echo "Building for Windows ARM64..."
-	@$(MAKE) build-rust-target
-	@$(MAKE) build-go-target
-	@$(MAKE) build-dotnet-target
-
-# Darwin (macOS) AMD64
-build-darwin-amd64: TARGET_OS=darwin
-build-darwin-amd64: TARGET_ARCH=amd64
-build-darwin-amd64: prepare-platform
-	@echo "Building for macOS AMD64..."
-	@$(MAKE) build-rust-target
-	@$(MAKE) build-go-target
-	@$(MAKE) build-dotnet-target
-
-# Darwin (macOS) ARM64
-build-darwin-arm64: TARGET_OS=darwin
-build-darwin-arm64: TARGET_ARCH=arm64
-build-darwin-arm64: prepare-platform
-	@echo "Building for macOS ARM64..."
-	@$(MAKE) build-rust-target
-	@$(MAKE) build-go-target
-	@$(MAKE) build-dotnet-target
-
-# Linux AMD64
-build-linux-amd64: TARGET_OS=linux
-build-linux-amd64: TARGET_ARCH=amd64
-build-linux-amd64: prepare-platform
-	@echo "Building for Linux AMD64..."
-	@$(MAKE) build-rust-target
-	@$(MAKE) build-go-target
-	@$(MAKE) build-dotnet-target
-
-# Linux ARM64
-build-linux-arm64: TARGET_OS=linux
-build-linux-arm64: TARGET_ARCH=arm64
-build-linux-arm64: prepare-platform
-	@echo "Building for Linux ARM64..."
-	@$(MAKE) build-rust-target
-	@$(MAKE) build-go-target
-	@$(MAKE) build-dotnet-target
+# Now generate all platform-specific targets
+$(eval $(call BUILD_PLATFORM,windows,amd64))
+$(eval $(call BUILD_PLATFORM,windows,arm64))
+$(eval $(call BUILD_PLATFORM,darwin,amd64))
+$(eval $(call BUILD_PLATFORM,darwin,arm64))
+$(eval $(call BUILD_PLATFORM,linux,amd64))
+$(eval $(call BUILD_PLATFORM,linux,arm64))
 
 # =============================================================================
 # Component build targets (used by platform-specific targets)
